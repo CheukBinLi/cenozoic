@@ -12,7 +12,11 @@
 	<packaging>war</packaging>
 	<name>cenozoic-web-front Maven Webapp</name>
 	<url>http://maven.apache.org</url>
-	<dependencies>	<!--JDBC -->
+	<properties>
+		<fasterxml.jackson.version>2.7.3</fasterxml.jackson.version>
+	</properties>
+	<dependencies>
+		<!--JDBC -->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -29,11 +33,6 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<version>4.0.0-b01</version>
-		</dependency>
-		<dependency>
-			<groupId>org.freemarker</groupId>
-			<artifactId>freemarker</artifactId>
-			<version>2.3.23</version>
 		</dependency>
 	</dependencies>
 	<build>

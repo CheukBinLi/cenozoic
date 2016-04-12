@@ -11,7 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 @Scope("prototype")
@@ -26,6 +28,14 @@ public class BaseController {
 		//			return new ModelAndView("proxy", getParams(request)).addObject("data", JspProxy.getProxy(url));
 		//		}
 		return new ModelAndView(path, getParams(request));
+	}
+
+	@ResponseBody
+	@RequestMapping("x1")
+	public Object aa() {
+		String[] o = new String[] { "123", "321", "123" };
+//		com.fasterxml.jackson.core.JsonProcessingException
+		return o;
 	}
 
 	protected final Map<String, Object> getParams(HttpServletRequest request) {
