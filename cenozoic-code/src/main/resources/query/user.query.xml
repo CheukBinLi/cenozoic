@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- <!DOCTYPE QueryList SYSTEM "Query.dtd"> -->
+<!DOCTYPE QueryList SYSTEM "file:///E:/javaProject/Eclipse/cenozoic/cenozoic-code/src/main/resources/dtd/Query.dtd">
+<QueryList package="">
+	<Query name="" type="HQL"></Query>
+</QueryList>

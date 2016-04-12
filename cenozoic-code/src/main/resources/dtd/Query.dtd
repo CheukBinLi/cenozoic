@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT QueryList (Query*)>
+<!--<!ELEMENT Context (CachePool,Bean*,Intercept*,ScanToPack*,CloneModel)>-->
+<!ELEMENT Query (#PCDATA)>
+
+<!--QueryList-->
+<!ATTLIST QueryList package CDATA #REQUIRED>
+<!--Query-->
+<!ATTLIST Query name CDATA #REQUIRED>
+<!ATTLIST Query type (HQL|SQL) #REQUIRED>
+<!ATTLIST Query resultType CDATA #IMPLIED>
+
