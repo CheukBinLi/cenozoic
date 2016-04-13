@@ -34,6 +34,11 @@
 			<artifactId>javax.servlet-api</artifactId>
 			<version>4.0.0-b01</version>
 		</dependency>
+		<dependency>
+			<groupId>com.freepig</groupId>
+			<artifactId>cenozoic-code</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>cenozoic-web-front</finalName>

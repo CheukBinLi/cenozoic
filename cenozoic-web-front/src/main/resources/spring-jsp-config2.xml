@@ -39,8 +39,6 @@
 
 	<!-- 视图 -->
 	<!-- <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"> <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" /> <property name="prefix" value="/WEB-INF/views/" /> <property name="suffix" value=".jsp" /> </bean> -->
-
-
 	<mvc:view-controller path="/" view-name="index" />
 
 	<!-- FreeMarker settings -->
@@ -74,8 +72,7 @@
 		<property name="requestContextAttribute" value="requestContext" />
 		<property name="attributes">
 			<props>
-<!-- 				<prop key="jqueryVersion">jquery-2.1.3.js</prop>
-				<prop key="angularjsVersion">1.4.0-rc.1</prop> -->
+				<!-- <prop key="jqueryVersion">jquery-2.1.3.js</prop> <prop key="angularjsVersion">1.4.0-rc.1</prop> -->
 			</props>
 		</property>
 	</bean>
@@ -88,6 +85,15 @@
 		<property name="locations" value="classpath:jdbc.properties" />
 		<!-- <property name="locations" value="/WEB-INF/jdbc.properties" /> -->
 	</bean>
+
+
+	<!-- QueryFile -->
+	<bean id="queryFactory" class="com.freepig.cenozoic.code.util.QueryFactory">
+		<property name="files">
+			<value>*.query.xml</value>
+		</property>
+	</bean>
+
 
 	<bean id="myDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
 

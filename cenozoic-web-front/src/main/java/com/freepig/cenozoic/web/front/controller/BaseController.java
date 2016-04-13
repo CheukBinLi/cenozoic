@@ -8,18 +8,23 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.freepig.cenozoic.code.util.QueryFactory;
 
 @Scope("prototype")
 @Controller
 @RequestMapping({ "/*", "/**", "/", "" })
 public class BaseController {
+
+	@Autowired
+	private QueryFactory queryFactory;
 
 	@RequestMapping("{path}")
 	public ModelAndView basePath(HttpServletRequest request, HttpServletResponse response, @PathVariable("path") String path) throws IOException {
@@ -34,7 +39,8 @@ public class BaseController {
 	@RequestMapping("x1")
 	public Object aa() {
 		String[] o = new String[] { "123", "321", "123" };
-//		com.fasterxml.jackson.core.JsonProcessingException
+		//		com.fasterxml.jackson.core.JsonProcessingException
+		queryFactory.getXQL("", false);
 		return o;
 	}
 
