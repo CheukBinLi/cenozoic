@@ -26,27 +26,22 @@ public class Scan {
 
 	public static final Set<String> doScan(String path) throws IOException, InterruptedException, ExecutionException {
 		Set<String> result = new HashSet<String>();
-		path = path.replace("*", ".*");
-		path = path.replace(File.separator, "/");
-		String[] paths = null;
-		paths = path.split(",");
-		String[] fullPaths = paths;
 
 		//后期换并发模式
-		for (int i = 0, len = paths.length; i < len; i++) {
-			Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources("");
-			Set<URL> scanResult = new LinkedHashSet<URL>();
-			while (urls.hasMoreElements()) {
-				//			 URL u = urls.nextElement();
-				scanResult.add(urls.nextElement());
-				//			 System.out.println(u.getFile());
-				// System.out.println(u.getFile().replace(File.separator, "/"));
-				// System.err.println(u.getFile().substring(u.getFile().indexOf(paths[0])));
-				// 第一段完成，遍历所有路径,再正则
-				// jar
-			}
-			result.addAll(classMatchFilter(fullPaths[i], scanResult));
+		//		for (int i = 0, len = paths.length; i < len; i++) {
+		Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources("");
+		Set<URL> scanResult = new LinkedHashSet<URL>();
+		while (urls.hasMoreElements()) {
+			//			 URL u = urls.nextElement();
+			scanResult.add(urls.nextElement());
+			//			 System.out.println(u.getFile());
+			// System.out.println(u.getFile().replace(File.separator, "/"));
+			// System.err.println(u.getFile().substring(u.getFile().indexOf(paths[0])));
+			// 第一段完成，遍历所有路径,再正则
+			// jar
 		}
+		result.addAll(classMatchFilter(path, scanResult));
+		//		}
 		try {
 			//			Iterator<String>a=result.iterator();
 			//			while(a.hasNext())
@@ -58,8 +53,16 @@ public class Scan {
 	}
 
 	protected static final Set<String> classMatchFilter(String path, Set<URL> paths) throws InterruptedException, ExecutionException {
-		path = path.replace("/**", "(/.*)?");
-		final String pathPattern = "^(/|.*/|.*)?" + path + "$";
+		String[] pathPattern = null;
+		path = path.replace("*", ".*").replace("/**", "(/.*)?").replace(File.separator, "/");
+		//		path = path.replace(File.separator, "/");
+		pathPattern = path.split(",");
+		for (int i = 0, len = pathPattern.length; i < len; i++) {
+			pathPattern[i] = String.format("^(/|.*/|.*)?%s$", pathPattern[i]);
+		}
+
+		//		path = path.replace("/**", "(/.*)?");
+		//		final String pathPattern = "^(/|.*/|.*)?" + path + "$";
 
 		final int startIndex = (new File(Thread.currentThread().getContextClassLoader().getResource("").getPath())).getPath().replace(File.separator, "/").length() + 1;
 		Set<URL> jarClassPaths = new HashSet<URL>();
@@ -80,13 +83,13 @@ public class Scan {
 		//过滤
 		futures.add(executorService.submit(new Scan.FileFilter(jarClassPaths, pathPattern, 0, countDownLatch) {
 			@Override
-			public Set<String> doFilter(Set<URL> url, String pathPattern, int startIndex) throws IOException {
+			public Set<String> doFilter(Set<URL> url, String[] pathPattern, int startIndex) throws IOException {
 				return jarTypeFilter(pathPattern, url);
 			}
 		}));
 		futures.add(executorService.submit(new Scan.FileFilter(fileClassPaths, pathPattern, startIndex, countDownLatch) {
 			@Override
-			public Set<String> doFilter(Set<URL> url, String pathPattern, int startIndex) {
+			public Set<String> doFilter(Set<URL> url, String[] pathPattern, int startIndex) {
 				Iterator<URL> it = url.iterator();
 				Set<String> result = new HashSet<String>();
 				while (it.hasNext())
@@ -103,7 +106,7 @@ public class Scan {
 	}
 
 	@SuppressWarnings("resource")
-	protected static final Set<String> jarTypeFilter(String pathPattern, Set<URL> urls) throws IOException {
+	protected static final Set<String> jarTypeFilter(String[] pathPattern, Set<URL> urls) throws IOException {
 		Set<String> result = new HashSet<String>();
 		Iterator<URL> it = urls.iterator();
 		URL u;
@@ -113,22 +116,26 @@ public class Scan {
 			Enumeration<JarEntry> jars = jarFile.entries();
 			while (jars.hasMoreElements()) {
 				JarEntry jarEntry = jars.nextElement();
-				if (jarEntry.getName().matches(pathPattern)) {
-					result.add(jarEntry.getName());
-				}
+				for (int i = 0, len = pathPattern.length; i < len; i++)
+					if (jarEntry.getName().matches(pathPattern[i])) {
+						result.add(jarEntry.getName());
+					}
 			}
 		}
 		return result;
 	}
 
-	protected static final Set<String> fileTypeFilter(File file, String pathPattern, int startIndex) {
+	protected static final Set<String> fileTypeFilter(File file, String[] pathPattern, int startIndex) {
 		//Map<String, String> result = new WeakHashMap<String, String>();
 		Set<String> result = new HashSet<String>();
+		String tempPath = null;
 		if (file.isFile()) {
-			if (file.getPath().replace(File.separator, "/").matches(pathPattern))
-				//result.put(file.getName(), file.getPath().substring(startIndex).replace(".class", "").replace(File.separator, "."));
-				//文件添加返回
-				result.add(file.getPath().substring(startIndex));
+			tempPath = file.getPath().replace(File.separator, "/");
+			for (int i = 0, len = pathPattern.length; i < len; i++)
+				if (tempPath.matches(pathPattern[i]))
+					//result.put(file.getName(), file.getPath().substring(startIndex).replace(".class", "").replace(File.separator, "."));
+					//文件添加返回
+					result.add(file.getPath().substring(startIndex));
 			return result;
 		}
 		else if (file.isDirectory()) {
@@ -143,19 +150,19 @@ public class Scan {
 
 	static abstract class FileFilter implements Callable<Set<String>> {
 
-		private String pathPattern;
+		private String[] pathPattern;
 		private Set<URL> urls;
 		private int startIndex;
 		private final CountDownLatch countDownLatch;
 
-		public FileFilter(Set<URL> urls, String pathPattern, final CountDownLatch countDownLatch) {
+		public FileFilter(Set<URL> urls, String[] pathPattern, final CountDownLatch countDownLatch) {
 			super();
 			this.pathPattern = pathPattern;
 			this.urls = urls;
 			this.countDownLatch = countDownLatch;
 		}
 
-		public FileFilter(Set<URL> urls, String pathPattern, int startIndex, final CountDownLatch countDownLatch) {
+		public FileFilter(Set<URL> urls, String[] pathPattern, int startIndex, final CountDownLatch countDownLatch) {
 			super();
 			this.pathPattern = pathPattern;
 			this.startIndex = startIndex;
@@ -163,7 +170,7 @@ public class Scan {
 			this.countDownLatch = countDownLatch;
 		}
 
-		public abstract Set<String> doFilter(Set<URL> url, String pathPattern, int startIndex) throws Exception;
+		public abstract Set<String> doFilter(Set<URL> url, String[] pathPattern, int startIndex) throws Exception;
 
 		public Set<String> call() throws Exception {
 			Set<String> result = doFilter(urls, pathPattern, startIndex);
