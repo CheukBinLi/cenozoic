@@ -27,25 +27,14 @@ public class Scan {
 	public static final Set<String> doScan(String path) throws IOException, InterruptedException, ExecutionException {
 		Set<String> result = new HashSet<String>();
 
-		//后期换并发模式
-		//		for (int i = 0, len = paths.length; i < len; i++) {
 		Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources("");
 		Set<URL> scanResult = new LinkedHashSet<URL>();
 		while (urls.hasMoreElements()) {
-			//			 URL u = urls.nextElement();
 			scanResult.add(urls.nextElement());
-			//			 System.out.println(u.getFile());
-			// System.out.println(u.getFile().replace(File.separator, "/"));
-			// System.err.println(u.getFile().substring(u.getFile().indexOf(paths[0])));
-			// 第一段完成，遍历所有路径,再正则
-			// jar
 		}
 		result.addAll(classMatchFilter(path, scanResult));
 		//		}
 		try {
-			//			Iterator<String>a=result.iterator();
-			//			while(a.hasNext())
-			//				System.out.println(a.next());
 			return result;
 		} finally {
 			//			executorService.shutdown();
@@ -55,14 +44,10 @@ public class Scan {
 	protected static final Set<String> classMatchFilter(String path, Set<URL> paths) throws InterruptedException, ExecutionException {
 		String[] pathPattern = null;
 		path = path.replace("*", ".*").replace("/**", "(/.*)?").replace(File.separator, "/");
-		//		path = path.replace(File.separator, "/");
 		pathPattern = path.split(",");
 		for (int i = 0, len = pathPattern.length; i < len; i++) {
 			pathPattern[i] = String.format("^(/|.*/|.*)?%s$", pathPattern[i]);
 		}
-
-		//		path = path.replace("/**", "(/.*)?");
-		//		final String pathPattern = "^(/|.*/|.*)?" + path + "$";
 
 		final int startIndex = (new File(Thread.currentThread().getContextClassLoader().getResource("").getPath())).getPath().replace(File.separator, "/").length() + 1;
 		Set<URL> jarClassPaths = new HashSet<URL>();
@@ -133,7 +118,6 @@ public class Scan {
 			tempPath = file.getPath().replace(File.separator, "/");
 			for (int i = 0, len = pathPattern.length; i < len; i++)
 				if (tempPath.matches(pathPattern[i]))
-					//result.put(file.getName(), file.getPath().substring(startIndex).replace(".class", "").replace(File.separator, "."));
 					//文件添加返回
 					result.add(file.getPath().substring(startIndex));
 			return result;
@@ -183,17 +167,8 @@ public class Scan {
 
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
-		String XM = "(^//.|^/)?:(/x)?$";
-		String XM2 = "^/c/a/v/v?+.*/.*.class$";
-		String XM3 = "^/c/a(/.*)?/x(/.*)?.class$";
-		System.err.println("c/a/v/c/".matches(XM));
-		System.err.println("XX:" + "/c/a/v/v/xxx/**.class".matches(XM2));
-		System.err.println("XX3:" + "/c/a/asd/asdf/x1/v/x/asdfsa/asdfsadf/df/123.class".matches(XM3));
-
-		//		String x0 = "(^/|^.*/|^.*).*.query.xml$";
-		String x1 = "(^/*)?/.*.query.xml$";
-		System.out.println("/*/1.query.xml".matches(x1));
 		Object o = doScan("/**/*.query.xml,/**/*.query2.xml");
 		System.out.println("X");
+
 	}
 }

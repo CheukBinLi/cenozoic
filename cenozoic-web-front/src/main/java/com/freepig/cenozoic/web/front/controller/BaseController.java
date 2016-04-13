@@ -40,7 +40,9 @@ public class BaseController {
 	public Object aa() {
 		String[] o = new String[] { "123", "321", "123" };
 		//		com.fasterxml.jackson.core.JsonProcessingException
-		queryFactory.getXQL("", false);
+		System.out.println(queryFactory.getXQL("com.freepig.cenozoic.code.entity.dbmapper.user.xxx", true));
+		System.err.println(queryFactory.getXQL("com.freepig.cenozoic.code.entity.dbmapper.userAAXXA.xxx", true));
+		System.err.println(queryFactory.getXQL("com.freepig.cenozoic.code.entity.dbmapper.userAAXXA.xxx", false));
 		return o;
 	}
 
