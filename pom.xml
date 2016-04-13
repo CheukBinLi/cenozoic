@@ -250,8 +250,9 @@
 		</dependency>
 	</dependencies>
 	<modules>
+		<module>cenozoic-config</module>
+		<module>cenozoic-code</module>
 		<module>cenozoic-web-background</module>
 		<module>cenozoic-web-front</module>
-		<module>cenozoic-config</module>
 	</modules>
 </project>
