@@ -61,9 +61,9 @@ public class BaseController {
 	public Object aa() throws TemplateException, IOException {
 		String[] o = new String[] { "123", "321", "123" };
 		//		com.fasterxml.jackson.core.JsonProcessingException
-		System.out.println(queryFactory.getXQL("com.freepig.cenozoic.code.entity.dbmapper.user.xxx", null, true));
-		System.err.println(queryFactory.getXQL("com.freepig.cenozoic.code.entity.dbmapper.userAAXXA.xxx", null, true));
-		System.err.println(queryFactory.getXQL("com.freepig.cenozoic.code.entity.dbmapper.userAAXXA.xxx", null, false));
+		//		System.out.println(queryFactory.getXQL("com.freepig.cenozoic.code.entity.dbmapper.user.xxx", null, true));
+		//		System.err.println(queryFactory.getXQL("com.freepig.cenozoic.code.entity.dbmapper.userAAXXA.xxx", null, true));
+		//		System.err.println(queryFactory.getXQL("com.freepig.cenozoic.code.entity.dbmapper.userAAXXA.xxx", null, false));
 		return o;
 	}
 

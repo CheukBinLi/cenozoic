@@ -8,14 +8,17 @@ public interface HibernateUtil {
 
 	/***
 	 * 列表
-	 * @param c 实体类文件
+	 * 
+	 * @param c
+	 *            实体类文件
 	 * @return
 	 * @throws Throwable
 	 */
 	public <T> List<T> getList(Class<?> c) throws Throwable;
 
 	/***
-	 *  带分页列表
+	 * 带分页列表
+	 * 
 	 * @param c
 	 * @param page
 	 * @param size
@@ -25,9 +28,12 @@ public interface HibernateUtil {
 	public <T> List<T> getList(Class<?> c, int page, int size) throws Throwable;
 
 	/***
-	 *  HQL列表查询
-	 * @param hql hql
-	 * @param params 参数(?)
+	 * HQL列表查询
+	 * 
+	 * @param hql
+	 *            hql
+	 * @param params
+	 *            参数(?)
 	 * @return
 	 * @throws Throwable
 	 */
@@ -35,11 +41,16 @@ public interface HibernateUtil {
 
 	/***
 	 * 
-	 *  带分页HQL列表查询
-	 * @param hql hql
-	 * @param page 页码
-	 * @param size 条目
-	 * @param params 参数( ? )
+	 * 带分页HQL列表查询
+	 * 
+	 * @param hql
+	 *            hql
+	 * @param page
+	 *            页码
+	 * @param size
+	 *            条目
+	 * @param params
+	 *            参数( ? )
 	 * @return
 	 * @throws Throwable
 	 */
@@ -47,8 +58,11 @@ public interface HibernateUtil {
 
 	/***
 	 * SQL列表查询
-	 * @param sql sql
-	 * @param params 参数( ? )
+	 * 
+	 * @param sql
+	 *            sql
+	 * @param params
+	 *            参数( ? )
 	 * @return
 	 * @throws Throwable
 	 */
@@ -56,11 +70,16 @@ public interface HibernateUtil {
 
 	/***
 	 * 
-	 *  带分页SQL列表查询
-	 * @param ql sql
-	 * @param page 页码
-	 * @param size 条目
-	 * @param params 参数( ?  )
+	 * 带分页SQL列表查询
+	 * 
+	 * @param ql
+	 *            sql
+	 * @param page
+	 *            页码
+	 * @param size
+	 *            条目
+	 * @param params
+	 *            参数( ? )
 	 * @return
 	 * @throws Throwable
 	 */
@@ -68,47 +87,32 @@ public interface HibernateUtil {
 
 	/***
 	 * query模板查询
-	 * @param queryName 查询语句名 
-	 * @param params 参数( :name  )
+	 * 
+	 * @param queryName
+	 *            查询语句名
+	 * @param params
+	 *            参数( :name )
 	 * @return
 	 * @throws Throwable
 	 */
-	public <T> List<T> getListByHqlQueryName(String queryName, Map<String, Object> params) throws Throwable;
+	public <T> List<T> getListByXqlQueryName(String queryName, boolean isHQL, boolean isFormat, Map<String, Object> params) throws Throwable;
 
 	/***
 	 * 
-	 * query模板查询
-	 * * @param queryName 查询语句名 
-	 * @param params 参数( :name  )
+	 * query模板查询 * @param queryName 查询语句名
+	 * 
+	 * @param params
+	 *            参数( :name )
 	 * @param page
 	 * @param size
 	 * @return
 	 * @throws Throwable
 	 */
-	public <T> List<T> getListByHqlQueryName(String queryName, Map<String, Object> params, int page, int size) throws Throwable;
-
-	/***
-	 * query模板查询
-	 * * @param queryName 查询语句名 
-	 * @param params 参数( :name  )
-	 * @return
-	 * @throws Throwable
-	 */
-	public <T> List<T> getListBySqlQueryName(String queryName, Map<String, Object> params) throws Throwable;
-
-	/***
-	 * query模板查询
-	 * * @param queryName 查询语句名 
-	 * @param params 参数( :name  )
-	 * @param page
-	 * @param size
-	 * @return
-	 * @throws Throwable
-	 */
-	public <T> List<T> getListBySqlQueryName(String queryName, Map<String, Object> params, int page, int size) throws Throwable;
+	public <T> List<T> getListByXqlQueryName(String queryName, boolean isHQL, boolean isFormat, Map<String, Object> params, int page, int size) throws Throwable;
 
 	/***
 	 * 通过ID查询
+	 * 
 	 * @param clazz
 	 * @param obj
 	 * @return
@@ -118,6 +122,7 @@ public interface HibernateUtil {
 
 	/***
 	 * 通过ID查询
+	 * 
 	 * @param clazz
 	 * @param obj
 	 * @return
@@ -127,6 +132,7 @@ public interface HibernateUtil {
 
 	/***
 	 * 通过ID删除
+	 * 
 	 * @param obj
 	 * @throws Throwable
 	 */
@@ -134,6 +140,7 @@ public interface HibernateUtil {
 
 	/***
 	 * 批量删除
+	 * 
 	 * @param list
 	 * @return
 	 * @throws Throwable
@@ -142,6 +149,7 @@ public interface HibernateUtil {
 
 	/***
 	 * 更新
+	 * 
 	 * @param o
 	 * @throws Throwable
 	 */
@@ -149,6 +157,7 @@ public interface HibernateUtil {
 
 	/***
 	 * 批量更新
+	 * 
 	 * @param o
 	 * @throws Throwable
 	 */
@@ -156,6 +165,7 @@ public interface HibernateUtil {
 
 	/***
 	 * 批量插入
+	 * 
 	 * @param list
 	 * @return
 	 * @throws Throwable
@@ -164,6 +174,7 @@ public interface HibernateUtil {
 
 	/***
 	 * 插入
+	 * 
 	 * @param t
 	 * @return
 	 * @throws Throwable
@@ -172,6 +183,7 @@ public interface HibernateUtil {
 
 	/***
 	 * 插入或更新
+	 * 
 	 * @param t
 	 * @throws Throwable
 	 */

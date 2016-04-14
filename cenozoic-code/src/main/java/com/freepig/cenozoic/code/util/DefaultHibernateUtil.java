@@ -56,22 +56,23 @@ public class DefaultHibernateUtil implements HibernateUtil {
 		return null == list ? null : list;
 	}
 
-	public <T> List<T> getListByHqlQueryName(String queryName, Map<String, Object> params) throws Throwable {
-		return getListByHqlQueryName(queryName, params, -1, -1);
+	//	public <T> List<T> getListByHqlQueryName(String queryName, Map<String, Object> params) throws Throwable {
+	//		return getListByHqlQueryName(queryName, params, -1, -1);
+	//	}
+	//
+	//	public <T> List<T> getListByHqlQueryName(String queryName, Map<String, Object> params, int page, int size) throws Throwable {
+	//		Query query = fillParams(getSession().createQuery(queryFactory.getXQL(queryName, params, true)), params);
+	//		List list = page > 0 ? page(query, page, size).list() : query.list();
+	//		return null == list ? null : list;
+	//	}
+
+	public <T> List<T> getListByXqlQueryName(String queryName, boolean isHQL, boolean isFormat, Map<String, Object> params) throws Throwable {
+		return getListByXqlQueryName(queryName, isHQL, isFormat, params, -1, -1);
 	}
 
-	public <T> List<T> getListByHqlQueryName(String queryName, Map<String, Object> params, int page, int size) throws Throwable {
-		Query query = fillParams(getSession().createQuery(queryFactory.getXQL(queryName, params, true)), params);
-		List list = page > 0 ? page(query, page, size).list() : query.list();
-		return null == list ? null : list;
-	}
-
-	public <T> List<T> getListBySqlQueryName(String queryName, Map<String, Object> params) throws Throwable {
-		return getListBySqlQueryName(queryName, params, -1, -1);
-	}
-
-	public <T> List<T> getListBySqlQueryName(String queryName, Map<String, Object> params, int page, int size) throws Throwable {
-		Query query = fillParams(getSession().createSQLQuery(queryFactory.getXQL(queryName, params, true)), params);
+	public <T> List<T> getListByXqlQueryName(String queryName, boolean isHQL, boolean isFormat, Map<String, Object> params, int page, int size) throws Throwable {
+		String xql = queryFactory.getXQL(queryName, isFormat, params);
+		Query query = fillParams(isHQL ? getSession().createSQLQuery(xql) : getSession().createSQLQuery(xql), params);
 		List list = page > 0 ? page(query, page, size).list() : query.list();
 		return null == list ? null : list;
 	}
@@ -95,7 +96,7 @@ public class DefaultHibernateUtil implements HibernateUtil {
 		Session s = getSession();
 		for (int i = 0, len = list.size(); i < len; i++) {
 			s.delete(list.get(i));
-			if (i % 50 == 0) {
+			if (i % 30 == 0) {
 				s.flush();
 				s.clear();
 			}
@@ -113,7 +114,7 @@ public class DefaultHibernateUtil implements HibernateUtil {
 		Session s = getSession();
 		for (int i = 0, len = list.size(); i < len; i++) {
 			s.update(list.get(i));
-			if (i % 50 == 0) {
+			if (i % 30 == 0) {
 				s.flush();
 				s.clear();
 			}
@@ -127,7 +128,7 @@ public class DefaultHibernateUtil implements HibernateUtil {
 		Session s = getSession();
 		for (int i = 0, len = list.size(); i < len; i++) {
 			s.save(list.get(i));
-			if (i % 50 == 0) {
+			if (i % 30 == 0) {
 				s.flush();
 				s.clear();
 			}

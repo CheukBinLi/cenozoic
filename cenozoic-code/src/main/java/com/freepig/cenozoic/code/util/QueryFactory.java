@@ -25,7 +25,6 @@ import freemarker.core.ParseException;
 import freemarker.template.Configuration;
 import freemarker.template.MalformedTemplateNameException;
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 import freemarker.template.TemplateNotFoundException;
 
 @Component
@@ -33,8 +32,8 @@ public class QueryFactory implements QueryType {
 
 	protected Logger log = Logger.getLogger(this.getClass().getName());
 
-	private final Map<String, Template> HQL = new ConcurrentHashMap<String, Template>();
-	private final Map<String, Template> SQL = new ConcurrentHashMap<String, Template>();
+	private final Map<String, Template> FORMAT_XQL = new ConcurrentHashMap<String, Template>();
+	private final Map<String, String> UNFORMAT_XQL = new ConcurrentHashMap<String, String>();
 	private final Configuration freemarkerConfiguration = new Configuration(Configuration.VERSION_2_3_0);
 	private StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();
 
@@ -47,30 +46,31 @@ public class QueryFactory implements QueryType {
 
 	private volatile boolean isScan = false;
 
-	public synchronized void put(String name, String XQL, boolean isHQL) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException {
+	public synchronized void put(String name, String XQL, boolean isFormat) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException {
 		if (null == name || null == XQL)
 			return;
-		stringTemplateLoader.putTemplate(name, XQL);
-		if (isHQL)
-			HQL.put(name, freemarkerConfiguration.getTemplate(name));
-		else
-			SQL.put(name, freemarkerConfiguration.getTemplate(name));
+		if (isFormat) {
+			stringTemplateLoader.putTemplate(name, XQL);
+			FORMAT_XQL.put(name, freemarkerConfiguration.getTemplate(name));
+		} else
+			UNFORMAT_XQL.put(name, XQL);
 
 	}
 
-	public String getXQL(String name, Map<String, Object> o, boolean isHQL) {
+	public String getXQL(String name, boolean isFormat, Map<String, Object> params) {
 		if (!isScan)
 			scan();
-		Template tp = isHQL ? HQL.get(name) : SQL.get(name);
+		if (isFormat)
+			return UNFORMAT_XQL.get(name);
+		Template tp = FORMAT_XQL.get(name);
 		if (null == tp)
 			return null;
 		StringWriter sw = new StringWriter();
 		try {
-			tp.process(o, sw);
+			tp.process(params, sw);
 		} catch (Exception e) {
 			DefaultLogFactory.newInstance().error(getClass(), String.format("getXQL :%s", name), e);
 		}
-		System.out.println(sw.toString());
 		return sw.toString();
 	}
 
@@ -114,7 +114,8 @@ public class QueryFactory implements QueryType {
 	}
 
 	class xmlHandler extends DefaultHandler {
-		private boolean isHQL = false;
+		//		private boolean isHQL = false;
+		private boolean format = false;
 		private String packageName = null;
 		private String name = null;
 
@@ -122,10 +123,10 @@ public class QueryFactory implements QueryType {
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 			if (qName.equals(QUERY_LIST)) {
 				packageName = attributes.getValue(PACKAGE);
-			}
-			else if (qName.equals(QUERY)) {
-				isHQL = attributes.getValue(TYPE).equals("HQL");
+			} else if (qName.equals(QUERY)) {
+				//				isHQL = attributes.getValue(TYPE).equals("HQL");
 				name = attributes.getValue(NAME);
+				format = Boolean.valueOf(attributes.getValue(FREEMARK_FORMAT));
 			}
 			super.startElement(uri, localName, qName, attributes);
 		}
@@ -134,7 +135,7 @@ public class QueryFactory implements QueryType {
 		public void characters(char[] ch, int start, int length) throws SAXException {
 			if (length > 0) {
 				try {
-					put(String.format("%s.%s", packageName, name).toLowerCase(), new String(ch, start, length), isHQL);
+					put(String.format("%s.%s", packageName, name).toLowerCase(), new String(ch, start, length), format);
 				} catch (Exception e) {
 					DefaultLogFactory.newInstance().error(getClass(), "xml读取失败", e);
 				}

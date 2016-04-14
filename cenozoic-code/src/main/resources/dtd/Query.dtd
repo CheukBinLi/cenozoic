@@ -8,5 +8,6 @@
 <!--Query-->
 <!ATTLIST Query name CDATA #REQUIRED>
 <!ATTLIST Query type (HQL|SQL) #REQUIRED>
+<!ATTLIST Query freemarkFormat (false|true) #REQUIRED>
 <!ATTLIST Query resultType CDATA #IMPLIED>
 
