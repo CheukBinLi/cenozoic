@@ -132,14 +132,13 @@
 	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
 		<property name="dataSource" ref="myDataSource" />
 		<!--实体类 -->
-		<property name="packagesToScan" value="com.freepig.*">
+		<property name="packagesToScan" value="com.freepig.*.*">
 		</property>
 		<property name="hibernateProperties">
 			<props>
-				<!-- <prop key="current_session_context_class">thread</prop> -->
 				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
-				<!-- <prop key="hibernate.autoReconnect">true</prop> -->
-				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.autoReconnect">true</prop>
+				<prop key="hibernate.show_sql">true</prop>
 				<prop key="hibernate.format_sql">false</prop>
 				<prop key="hibernate.hbm2ddl.auto">update</prop>
 			</props>

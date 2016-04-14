@@ -70,6 +70,7 @@ public class QueryFactory implements QueryType {
 		} catch (Exception e) {
 			DefaultLogFactory.newInstance().error(getClass(), String.format("getXQL :%s", name), e);
 		}
+		System.out.println(sw.toString());
 		return sw.toString();
 	}
 
@@ -133,7 +134,7 @@ public class QueryFactory implements QueryType {
 		public void characters(char[] ch, int start, int length) throws SAXException {
 			if (length > 0) {
 				try {
-					put(String.format("%s.%s", packageName, name), new String(ch, start, length), isHQL);
+					put(String.format("%s.%s", packageName, name).toLowerCase(), new String(ch, start, length), isHQL);
 				} catch (Exception e) {
 					DefaultLogFactory.newInstance().error(getClass(), "xml读取失败", e);
 				}

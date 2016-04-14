@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- <!DOCTYPE QueryList SYSTEM "Query.dtd"> -->
 <!DOCTYPE QueryList SYSTEM "file:///E:/javaProject/Eclipse/cenozoic/cenozoic-code/src/main/resources/dtd/Query.dtd">
-<QueryList package="com.freepig.cenozoic.code.entity.dbmapper.user">
-	<Query name="xxx" type="HQL">hello world!</Query>
+<QueryList package="com.freepig.cenozoic.code.dbmapper.entity.User">
+	<Query name="login" type="HQL">
+		FROM com.freepig.cenozoic.code.dbmapper.entity.User u WHERE u.phone=:phone and u.password=:password
+	</Query>
 </QueryList>

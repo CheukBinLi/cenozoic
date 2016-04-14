@@ -16,7 +16,7 @@ public class freemarktest {
 
 	public static void main(String[] args) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, TemplateException, IOException {
 
-		Configuration cfg = new Configuration();
+		Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
 		StringTemplateLoader loader = new StringTemplateLoader();
 		loader.putTemplate("A1", "${name}你好吗？");
 		loader.putTemplate("A2", "你好，${name}今天约吗？");

@@ -25,21 +25,21 @@ public class ObjectFill {
 		return map;
 	}
 
-	public final <T> T fillObject(Class<T> t, Map<String, String> data) throws IllegalArgumentException, IllegalAccessException, InstantiationException {
+	public final <T> T fillObject(Class<T> t, Map<String, ?> data) throws IllegalArgumentException, IllegalAccessException, InstantiationException {
 		return fillObject(t.newInstance(), data);
 	}
 
-	public final <T> T fillObject(T t, Map<String, String> data) throws IllegalArgumentException, IllegalAccessException {
+	public final <T> T fillObject(T t, Map<String, ?> data) throws IllegalArgumentException, IllegalAccessException {
 		System.out.println(t.getClass());
 		Class<?> c = t.getClass();
 		if (!FIELDS.containsKey(c))
 			scanClass(c);
 		Map<String, Field> fields = FIELDS.get(c);
-		String value;
+		Object value;
 		Field field;
-		for (Entry<String, String> en : data.entrySet()) {
+		for (Entry<String, ?> en : data.entrySet()) {
 			value = en.getValue();
-			if (null == value || value.isEmpty())
+			if (null == value)
 				continue;
 			field = fields.get(en.getKey());
 			field.set(t, getValue(field.getType(), value));
@@ -48,7 +48,7 @@ public class ObjectFill {
 		return t;
 	}
 
-	private Object getValue(Class<?> c, String data) {
+	private Object getValue(Class<?> c, Object data) {
 		String simpleName = c.getSimpleName();
 		if (c.isArray()) {
 			System.err.println("数组末实现");
@@ -57,28 +57,28 @@ public class ObjectFill {
 		else if (simpleName.equalsIgnoreCase("String"))
 			return data;
 		else if (simpleName.equalsIgnoreCase("boolean") || simpleName.equalsIgnoreCase("Boolean"))
-			return Boolean.valueOf(data);
+			return Boolean.valueOf(data.toString());
 		else if (simpleName.equalsIgnoreCase("int") || simpleName.equalsIgnoreCase("Integer"))
-			return Integer.valueOf(data);
+			return Integer.valueOf(data.toString());
 		else if (simpleName.equalsIgnoreCase("byte"))
-			return Byte.valueOf(data);
+			return Byte.valueOf(data.toString());
 		else if (simpleName.equalsIgnoreCase("char") || simpleName.equalsIgnoreCase("Character"))
-			return Character.valueOf(data.charAt(0));
+			return Character.valueOf(data.toString().charAt(0));
 		else if (simpleName.equalsIgnoreCase("double"))
-			return Double.valueOf(data);
+			return Double.valueOf(data.toString());
 		else if (simpleName.equalsIgnoreCase("long"))
-			return Long.valueOf(data);
+			return Long.valueOf(data.toString());
 		else if (simpleName.equalsIgnoreCase("short"))
-			return Short.valueOf(data);
+			return Short.valueOf(data.toString());
 		else if (simpleName.equalsIgnoreCase("float"))
-			return Float.valueOf(data);
+			return Float.valueOf(data.toString());
 		return data;
 	}
 
 	public static void main(String[] args) throws IllegalArgumentException, IllegalAccessException, InstantiationException {
-		System.out.println(AbstractHibernateUtil.class);
+		System.out.println(DefaultHibernateUtil.class);
 		ObjectFill of = new ObjectFill();
-		Map<String, String> a = new HashMap<String, String>();
+		Map<String, Object> a = new HashMap<String, Object>();
 		a.put("name", "李好吗");
 		a.put("phone", "131239919191");
 		User u = of.fillObject(User.class, a);

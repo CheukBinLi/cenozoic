@@ -114,7 +114,16 @@ public interface HibernateUtil {
 	 * @return
 	 * @throws Throwable
 	 */
-	public <T> T get(Class<T> clazz, Serializable obj) throws Throwable;
+	public <T> T get(Class<T> clazz, Serializable id) throws Throwable;
+
+	/***
+	 * 通过ID查询
+	 * @param clazz
+	 * @param obj
+	 * @return
+	 * @throws Throwable
+	 */
+	public <T> T load(Class<T> clazz, Serializable id) throws Throwable;
 
 	/***
 	 * 通过ID删除
@@ -159,7 +168,7 @@ public interface HibernateUtil {
 	 * @return
 	 * @throws Throwable
 	 */
-	public <T> T save(Object t) throws Throwable;
+	public <T> T save(T t) throws Throwable;
 
 	/***
 	 * 插入或更新
@@ -167,4 +176,6 @@ public interface HibernateUtil {
 	 * @throws Throwable
 	 */
 	public void saveOrUpdate(Object t) throws Throwable;
+
+	public String queryNameFormat(Class<?> entry, String queryName);
 }

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public abstract class AbstractHibernateUtil implements HibernateUtil {
+public class DefaultHibernateUtil implements HibernateUtil {
 
 	@Autowired
 	private SessionFactory sessionFactory;
@@ -22,7 +22,8 @@ public abstract class AbstractHibernateUtil implements HibernateUtil {
 	private QueryFactory queryFactory;
 
 	public Session getSession() {
-		return sessionFactory.getCurrentSession();
+		//		return sessionFactory.getCurrentSession();
+		return sessionFactory.openSession();
 	}
 
 	public <T> List<T> getList(Class<?> c) throws Throwable {
@@ -36,14 +37,22 @@ public abstract class AbstractHibernateUtil implements HibernateUtil {
 	}
 
 	public <T> List<T> getListByHQL(String hql, Object... params) throws Throwable {
-		Query query = getSession().createQuery(hql);
-		List list = fillParams(query, params).list();
+		return getListByHQL(hql, -1, -1, params);
+	}
+
+	public <T> List<T> getListByHQL(String hql, int page, int size, Object... params) throws Throwable {
+		Query query = fillParams(getSession().createQuery(hql), params);
+		List list = page > 0 ? page(query, page, page).list() : query.list();
 		return null == list ? null : list;
 	}
 
 	public <T> List<T> getListBySQL(String sql, Object... params) throws Throwable {
-		Query query = getSession().createSQLQuery(sql);
-		List list = fillParams(query, params).list();
+		return getListBySQL(sql, -1, -1, params);
+	}
+
+	public <T> List<T> getListBySQL(String sql, int page, int size, Object... params) throws Throwable {
+		Query query = fillParams(getSession().createSQLQuery(sql), params);
+		List list = page > 0 ? page(query, page, page).list() : query.list();
 		return null == list ? null : list;
 	}
 
@@ -67,8 +76,14 @@ public abstract class AbstractHibernateUtil implements HibernateUtil {
 		return null == list ? null : list;
 	}
 
-	public <T> T get(Class<T> clazz, Serializable obj) throws Throwable {
-		return getSession().get(clazz, obj);
+	public <T> T get(Class<T> clazz, Serializable id) throws Throwable {
+		Object o = getSession().get(clazz, id);
+		return (T) (null == o ? null : o);
+	}
+
+	public <T> T load(Class<T> clazz, Serializable id) throws Throwable {
+		Object o = getSession().load(clazz, id);
+		return (T) (null == o ? null : o);
 	}
 
 	public void delete(Object obj) throws Throwable {
@@ -121,9 +136,9 @@ public abstract class AbstractHibernateUtil implements HibernateUtil {
 		return count;
 	}
 
-	public <T> T save(Object o) throws Throwable {
-		Object result = getSession().save(o);
-		return (T) (null == result ? null : result);
+	public <T> T save(T o) throws Throwable {
+		getSession().save(o);
+		return o;
 	}
 
 	public void saveOrUpdate(Object t) throws Throwable {
@@ -145,7 +160,10 @@ public abstract class AbstractHibernateUtil implements HibernateUtil {
 			return q;
 		}
 		for (Entry<String, ?> en : o.entrySet())
-			q.setParameter(en.getKey(), en.getValue());
+			try {
+				q.setParameter(en.getKey(), en.getValue());
+			} catch (Exception e) {
+			}
 		return q;
 	}
 
@@ -155,6 +173,10 @@ public abstract class AbstractHibernateUtil implements HibernateUtil {
 			q.setMaxResults(size);
 		}
 		return q;
+	}
+
+	public String queryNameFormat(Class<?> entry, String queryName) {
+		return String.format("%s.%s", entry.getName(), queryName).toLowerCase();
 	}
 
 }
