@@ -1,66 +1,85 @@
 package com.freepig.cenozoic.code.util;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
+import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
+
+import freemarker.cache.StringTemplateLoader;
+import freemarker.core.ParseException;
+import freemarker.template.Configuration;
+import freemarker.template.MalformedTemplateNameException;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
 
 @Component
 public class QueryFactory implements QueryType {
 
-	private final Map<String, String> HQL = new ConcurrentHashMap<String, String>();
-	private final Map<String, String> SQL = new ConcurrentHashMap<String, String>();
+	protected Logger log = Logger.getLogger(this.getClass().getName());
+
+	private final Map<String, Template> HQL = new ConcurrentHashMap<String, Template>();
+	private final Map<String, Template> SQL = new ConcurrentHashMap<String, Template>();
+	private final Configuration freemarkerConfiguration = new Configuration(Configuration.VERSION_2_3_0);
+	private StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();
 
 	private String files;
 
-	private volatile boolean isScan = false;
-
-	public void put(String name, String XQL, boolean isHQL) {
-		if (null == name || null == XQL)
-			return;
-		if (isHQL)
-			HQL.put(name, XQL);
-		else
-			SQL.put(name, XQL);
+	public QueryFactory() {
+		super();
+		freemarkerConfiguration.setTemplateLoader(stringTemplateLoader);
 	}
 
-	public String getXQL(String name, boolean isHQL) {
+	private volatile boolean isScan = false;
+
+	public synchronized void put(String name, String XQL, boolean isHQL) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException {
+		if (null == name || null == XQL)
+			return;
+		stringTemplateLoader.putTemplate(name, XQL);
+		if (isHQL)
+			HQL.put(name, freemarkerConfiguration.getTemplate(name));
+		else
+			SQL.put(name, freemarkerConfiguration.getTemplate(name));
+
+	}
+
+	public String getXQL(String name, Map<String, Object> o, boolean isHQL) {
 		if (!isScan)
 			scan();
-		if (null == name)
+		Template tp = isHQL ? HQL.get(name) : SQL.get(name);
+		if (null == tp)
 			return null;
-		if (isHQL)
-			return HQL.get(name);
-		return SQL.get(name);
+		StringWriter sw = new StringWriter();
+		try {
+			tp.process(o, sw);
+		} catch (Exception e) {
+			DefaultLogFactory.newInstance().error(getClass(), String.format("getXQL :%s", name), e);
+		}
+		return sw.toString();
 	}
 
 	private void scan() {
 		Set<String> o = null;
 		try {
 			o = Scan.doScan(files);
-			x(o);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
+			xmlExplain(o);
+		} catch (Exception e) {
+			DefaultLogFactory.newInstance().error(getClass(), "装载Query文件失败", e);
 		}
 		isScan = true;
 	}
@@ -73,20 +92,23 @@ public class QueryFactory implements QueryType {
 		this.files = files;
 	}
 
-	public void x(Set<String> urls) throws ParserConfigurationException, SAXException, IOException {
+	public void xmlExplain(Set<String> urls) throws ParserConfigurationException, SAXException, IOException {
 		Iterator<String> it = urls.iterator();
 		SAXParserFactory factory = SAXParserFactory.newInstance();
+		SAXParser parser = factory.newSAXParser();
+		xmlHandler handler = new xmlHandler();
+		XMLReader xmlReader = parser.getXMLReader();
+		xmlReader.setEntityResolver(new EntityResolver() {
+			public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+				return new InputSource(this.getClass().getClassLoader().getResourceAsStream("dtd/Query.dtd"));
+			}
+		});
 		while (it.hasNext()) {
-			SAXParser parser = factory.newSAXParser();
-			xmlHandler handler = new xmlHandler();
 			String str = it.next();
-			System.err.println(str);
-			//		String x = null;
-			//		ByteArrayInputStream in = new ByteArrayInputStream(x.getBytes());
 			InputSource is = new InputSource(Thread.currentThread().getContextClassLoader().getResourceAsStream(str));
-			//			InputSource is = new InputSource(Thread.currentThread().getContextClassLoader().getResourceAsStream(it.next()));
 			is.setEncoding("utf-8");
-			parser.parse(is, handler);
+			xmlReader.setContentHandler(handler);
+			xmlReader.parse(is);
 		}
 	}
 
@@ -110,11 +132,14 @@ public class QueryFactory implements QueryType {
 		@Override
 		public void characters(char[] ch, int start, int length) throws SAXException {
 			if (length > 0) {
-				put(String.format("%s.%s", packageName, name), new String(ch, start, length), isHQL);
+				try {
+					put(String.format("%s.%s", packageName, name), new String(ch, start, length), isHQL);
+				} catch (Exception e) {
+					DefaultLogFactory.newInstance().error(getClass(), "xml读取失败", e);
+				}
 			}
 			super.characters(ch, start, length);
 		}
-
 	}
 
 }

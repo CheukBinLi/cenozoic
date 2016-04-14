@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.freepig.cenozoic.code.entity.dbmapper.User;
+import com.freepig.cenozoic.code.dbmapper.entity.User;
 
 public class ObjectFill {
 

@@ -26,7 +26,12 @@ public abstract class AbstractHibernateUtil implements HibernateUtil {
 	}
 
 	public <T> List<T> getList(Class<?> c) throws Throwable {
-		List list = getSession().createQuery(String.format("FROM %s a", c.getSimpleName())).list();
+		return getList(c, -1, -1);
+	}
+
+	public <T> List<T> getList(Class<?> c, int page, int size) throws Throwable {
+		Query query = getSession().createQuery(String.format("FROM %s a", c.getSimpleName()));
+		List list = page > 0 ? page(query, page, size).list() : query.list();
 		return null == list ? null : list;
 	}
 
@@ -42,14 +47,24 @@ public abstract class AbstractHibernateUtil implements HibernateUtil {
 		return null == list ? null : list;
 	}
 
-	public <T> List<T> getListByHqlQueryName(String hql, Map<String, ?> params) throws Throwable {
-		System.err.println("末实现");
-		return null;
+	public <T> List<T> getListByHqlQueryName(String queryName, Map<String, Object> params) throws Throwable {
+		return getListByHqlQueryName(queryName, params, -1, -1);
 	}
 
-	public <T> List<T> getListBySqlQueryName(String sql, Map<String, ?> params) throws Throwable {
-		System.err.println("末实现");
-		return null;
+	public <T> List<T> getListByHqlQueryName(String queryName, Map<String, Object> params, int page, int size) throws Throwable {
+		Query query = fillParams(getSession().createQuery(queryFactory.getXQL(queryName, params, true)), params);
+		List list = page > 0 ? page(query, page, size).list() : query.list();
+		return null == list ? null : list;
+	}
+
+	public <T> List<T> getListBySqlQueryName(String queryName, Map<String, Object> params) throws Throwable {
+		return getListBySqlQueryName(queryName, params, -1, -1);
+	}
+
+	public <T> List<T> getListBySqlQueryName(String queryName, Map<String, Object> params, int page, int size) throws Throwable {
+		Query query = fillParams(getSession().createSQLQuery(queryFactory.getXQL(queryName, params, true)), params);
+		List list = page > 0 ? page(query, page, size).list() : query.list();
+		return null == list ? null : list;
 	}
 
 	public <T> T get(Class<T> clazz, Serializable obj) throws Throwable {

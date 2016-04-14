@@ -68,44 +68,44 @@ public interface HibernateUtil {
 
 	/***
 	 * query模板查询
-	 * @param hql hql
+	 * @param queryName 查询语句名 
 	 * @param params 参数( :name  )
 	 * @return
 	 * @throws Throwable
 	 */
-	public <T> List<T> getListByHqlQueryName(String hql, Map<String, ?> params) throws Throwable;
+	public <T> List<T> getListByHqlQueryName(String queryName, Map<String, Object> params) throws Throwable;
 
 	/***
 	 * 
 	 * query模板查询
-	 * @param hql
+	 * * @param queryName 查询语句名 
 	 * @param params 参数( :name  )
 	 * @param page
 	 * @param size
 	 * @return
 	 * @throws Throwable
 	 */
-	public <T> List<T> getListByHqlQueryName(String hql, Map<String, ?> params, int page, int size) throws Throwable;
+	public <T> List<T> getListByHqlQueryName(String queryName, Map<String, Object> params, int page, int size) throws Throwable;
 
 	/***
 	 * query模板查询
-	 * @param sql
+	 * * @param queryName 查询语句名 
 	 * @param params 参数( :name  )
 	 * @return
 	 * @throws Throwable
 	 */
-	public <T> List<T> getListBySqlQueryName(String sql, Map<String, ?> params) throws Throwable;
+	public <T> List<T> getListBySqlQueryName(String queryName, Map<String, Object> params) throws Throwable;
 
 	/***
 	 * query模板查询
-	 * @param sql 
+	 * * @param queryName 查询语句名 
 	 * @param params 参数( :name  )
 	 * @param page
 	 * @param size
 	 * @return
 	 * @throws Throwable
 	 */
-	public <T> List<T> getListBySqlQueryName(String sql, Map<String, ?> params, int page, int size) throws Throwable;
+	public <T> List<T> getListBySqlQueryName(String queryName, Map<String, Object> params, int page, int size) throws Throwable;
 
 	/***
 	 * 通过ID查询

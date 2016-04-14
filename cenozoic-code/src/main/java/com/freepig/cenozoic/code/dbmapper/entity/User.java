@@ -1,4 +1,4 @@
-package com.freepig.cenozoic.code.entity.dbmapper;
+package com.freepig.cenozoic.code.dbmapper.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
