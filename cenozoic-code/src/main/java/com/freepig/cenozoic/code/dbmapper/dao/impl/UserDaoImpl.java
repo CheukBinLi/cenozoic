@@ -44,6 +44,11 @@ public class UserDaoImpl implements UserDao {
 		return null;
 	}
 
+	public int checkUser(Map<String, Object> params) throws Throwable {
+		long o = (Long) hibernateUtil.uniqueResult(hibernateUtil.queryNameFormat(User.class, "checkUser"), true, false, params);
+		return (int) o;
+	}
+
 	//	@SuppressWarnings({ "rawtypes", "unchecked" })
 	//	public List<User> getListByHql(String hql, Object params) throws Throwable {
 	//		List list = hibernateUtil.getListByHQL("from com.freepig.cenozoic.code.dbmapper.entity.User u", null);

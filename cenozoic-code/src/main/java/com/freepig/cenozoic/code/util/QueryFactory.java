@@ -2,11 +2,13 @@ package com.freepig.cenozoic.code.util;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.PostConstruct;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -27,6 +29,7 @@ import freemarker.template.MalformedTemplateNameException;
 import freemarker.template.Template;
 import freemarker.template.TemplateNotFoundException;
 
+@SuppressWarnings("restriction")
 @Component
 public class QueryFactory implements QueryType {
 
@@ -44,7 +47,7 @@ public class QueryFactory implements QueryType {
 		freemarkerConfiguration.setTemplateLoader(stringTemplateLoader);
 	}
 
-	private volatile boolean isScan = false;
+	//	private volatile boolean isScan = false;
 
 	public synchronized void put(String name, String XQL, boolean isFormat) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException {
 		if (null == name || null == XQL)
@@ -52,15 +55,16 @@ public class QueryFactory implements QueryType {
 		if (isFormat) {
 			stringTemplateLoader.putTemplate(name, XQL);
 			FORMAT_XQL.put(name, freemarkerConfiguration.getTemplate(name));
-		} else
+		}
+		else
 			UNFORMAT_XQL.put(name, XQL);
 
 	}
 
 	public String getXQL(String name, boolean isFormat, Map<String, Object> params) {
-		if (!isScan)
-			scan();
-		if (isFormat)
+		//		if (!isScan)
+		//			scan();
+		if (!isFormat)
 			return UNFORMAT_XQL.get(name);
 		Template tp = FORMAT_XQL.get(name);
 		if (null == tp)
@@ -74,6 +78,7 @@ public class QueryFactory implements QueryType {
 		return sw.toString();
 	}
 
+	@PostConstruct
 	private void scan() {
 		Set<String> o = null;
 		try {
@@ -82,7 +87,8 @@ public class QueryFactory implements QueryType {
 		} catch (Exception e) {
 			DefaultLogFactory.newInstance().error(getClass(), "装载Query文件失败", e);
 		}
-		isScan = true;
+
+		//		isScan = true;
 	}
 
 	public String getFiles() {
@@ -116,17 +122,26 @@ public class QueryFactory implements QueryType {
 	class xmlHandler extends DefaultHandler {
 		//		private boolean isHQL = false;
 		private boolean format = false;
+		private boolean alias = false;
 		private String packageName = null;
 		private String name = null;
+		private String fullName;
+		private String aliasName;
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 			if (qName.equals(QUERY_LIST)) {
 				packageName = attributes.getValue(PACKAGE);
-			} else if (qName.equals(QUERY)) {
+			}
+			else if (qName.equals(QUERY)) {
 				//				isHQL = attributes.getValue(TYPE).equals("HQL");
 				name = attributes.getValue(NAME);
 				format = Boolean.valueOf(attributes.getValue(FREEMARK_FORMAT));
+				alias = Boolean.valueOf(attributes.getValue(ALIAS));
+			}
+			else if (qName.equals(ALIAS)) {
+				aliasName = attributes.getValue(ALIAS);
+				fullName = attributes.getValue(NAME);
 			}
 			super.startElement(uri, localName, qName, attributes);
 		}
@@ -135,7 +150,7 @@ public class QueryFactory implements QueryType {
 		public void characters(char[] ch, int start, int length) throws SAXException {
 			if (length > 0) {
 				try {
-					put(String.format("%s.%s", packageName, name).toLowerCase(), new String(ch, start, length), format);
+					put(String.format("%s.%s", packageName, name).toLowerCase(), alias ? new String(ch, start, length).replaceAll(aliasName, fullName) : new String(ch, start, length), format);
 				} catch (Exception e) {
 					DefaultLogFactory.newInstance().error(getClass(), "xml读取失败", e);
 				}
@@ -143,5 +158,4 @@ public class QueryFactory implements QueryType {
 			super.characters(ch, start, length);
 		}
 	}
-
 }

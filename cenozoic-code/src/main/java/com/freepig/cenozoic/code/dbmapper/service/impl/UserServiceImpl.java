@@ -62,4 +62,10 @@ public class UserServiceImpl extends ObjectFill implements UserService {
 
 	}
 
+	public boolean checkUser(Map<String, Object> params) throws Throwable {
+		//		Map<String, Object> params = new HashMap<String, Object>();
+		//		params.put("phone", phone);
+		return userDao.checkUser(params) > 0;
+	}
+
 }

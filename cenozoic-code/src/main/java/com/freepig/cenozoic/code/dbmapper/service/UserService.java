@@ -8,4 +8,6 @@ public interface UserService extends BaseService<User> {
 
 	User login(Map<String, Object> params) throws Throwable;
 
+	boolean checkUser(Map<String, Object> params) throws Throwable;
+
 }

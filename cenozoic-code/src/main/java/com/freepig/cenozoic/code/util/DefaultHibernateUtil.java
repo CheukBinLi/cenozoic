@@ -66,13 +66,26 @@ public class DefaultHibernateUtil implements HibernateUtil {
 	//		return null == list ? null : list;
 	//	}
 
+	public Object uniqueResult(String xql, boolean isHQL, Object... params) {
+		Query query = fillParams(isHQL ? getSession().createQuery(xql) : getSession().createSQLQuery(xql), params);
+		Object o = query.uniqueResult();
+		return null == o ? null : o;
+	}
+
+	public Object uniqueResult(String queryName, boolean isHQL, boolean isFormat, Map<String, Object> params) {
+		String xql = queryFactory.getXQL(queryName, isFormat, params);
+		Query query = fillParams(isHQL ? getSession().createQuery(xql) : getSession().createSQLQuery(xql), params);
+		Object o = query.uniqueResult();
+		return null == o ? null : o;
+	}
+
 	public <T> List<T> getListByXqlQueryName(String queryName, boolean isHQL, boolean isFormat, Map<String, Object> params) throws Throwable {
 		return getListByXqlQueryName(queryName, isHQL, isFormat, params, -1, -1);
 	}
 
 	public <T> List<T> getListByXqlQueryName(String queryName, boolean isHQL, boolean isFormat, Map<String, Object> params, int page, int size) throws Throwable {
 		String xql = queryFactory.getXQL(queryName, isFormat, params);
-		Query query = fillParams(isHQL ? getSession().createSQLQuery(xql) : getSession().createSQLQuery(xql), params);
+		Query query = fillParams(isHQL ? getSession().createQuery(xql) : getSession().createSQLQuery(xql), params);
 		List list = page > 0 ? page(query, page, size).list() : query.list();
 		return null == list ? null : list;
 	}

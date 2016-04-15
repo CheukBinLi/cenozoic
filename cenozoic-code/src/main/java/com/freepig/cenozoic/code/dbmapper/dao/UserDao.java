@@ -13,4 +13,6 @@ public interface UserDao extends BaseDao<User, Integer> {
 	 */
 	User login(Map<String, Object> params) throws Throwable;
 
+	int checkUser(Map<String, Object> params) throws Throwable;
+
 }

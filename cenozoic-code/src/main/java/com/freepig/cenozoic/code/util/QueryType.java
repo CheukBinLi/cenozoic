@@ -8,6 +8,7 @@ public interface QueryType {
 	String PACKAGE = "package";
 	String NAME = "name";
 	String TYPE = "type";
+	String ALIAS = "Alias";
 	String RESULT_TYPE = "resultType";
 
 }

@@ -85,6 +85,10 @@ public interface HibernateUtil {
 	 */
 	public <T> List<T> getListBySQL(String sql, int page, int size, Object... params) throws Throwable;
 
+	public Object uniqueResult(String xql, boolean isHql, Object... params) throws Throwable;
+
+	public Object uniqueResult(String queryName, boolean isHql, boolean isFormat, Map<String, Object> params) throws Throwable;
+
 	/***
 	 * query模板查询
 	 * 
