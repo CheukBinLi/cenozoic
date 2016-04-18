@@ -38,7 +38,7 @@ public class UserDaoImpl implements UserDao {
 
 	@SuppressWarnings("rawtypes")
 	public User login(Map<String, Object> params) throws Throwable {
-		List list = hibernateUtil.getListByXqlQueryName(hibernateUtil.queryNameFormat(User.class, "login"), true, false, params);
+		List list = hibernateUtil.getListByXqlQueryName(hibernateUtil.queryNameFormat(User.class, "login"), true, true, params);
 		if (null != list)
 			return (User) (list.size() > 0 ? list.get(0) : null);
 		return null;

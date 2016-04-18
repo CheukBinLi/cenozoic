@@ -56,8 +56,9 @@ public class QueryFactory implements QueryType {
 			stringTemplateLoader.putTemplate(name, XQL);
 			FORMAT_XQL.put(name, freemarkerConfiguration.getTemplate(name));
 		}
-		else
+		else {
 			UNFORMAT_XQL.put(name, XQL);
+		}
 
 	}
 
@@ -127,6 +128,7 @@ public class QueryFactory implements QueryType {
 		private String name = null;
 		private String fullName;
 		private String aliasName;
+		private String value;
 
 		@Override
 		public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
@@ -148,14 +150,15 @@ public class QueryFactory implements QueryType {
 
 		@Override
 		public void characters(char[] ch, int start, int length) throws SAXException {
-			if (length > 0) {
+			value = new String(ch, start, length).replaceAll("(\n|\t|)", "");
+			if (value.length() > 0) {
 				try {
-					put(String.format("%s.%s", packageName, name).toLowerCase(), alias ? new String(ch, start, length).replaceAll(aliasName, fullName) : new String(ch, start, length), format);
+					put(String.format("%s.%s", packageName, name).toLowerCase(), alias ? value.replaceAll(aliasName, fullName) : value, format);
 				} catch (Exception e) {
 					DefaultLogFactory.newInstance().error(getClass(), "xml读取失败", e);
 				}
 			}
-			super.characters(ch, start, length);
+			//super.characters(ch, start, length);
 		}
 	}
 }

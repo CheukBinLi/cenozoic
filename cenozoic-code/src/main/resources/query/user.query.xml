@@ -3,8 +3,16 @@
 <!DOCTYPE QueryList SYSTEM "file:///E:/javaProject/Eclipse/cenozoic/cenozoic-code/src/main/resources/dtd/Query.dtd">
 <QueryList package="com.freepig.cenozoic.code.dbmapper.entity.User">
 	<Alias name="com.freepig.cenozoic.code.dbmapper.entity.User" Alias="User" />
-	<Query name="login" type="HQL" freemarkFormat="false" Alias="true">
-		FROM User u WHERE u.phone=:phone and u.password=:password
+	<Query name="login" type="HQL" freemarkFormat="true" Alias="true">
+		<![CDATA[ 
+			FROM User u 
+			WHERE 
+			1=1
+			<#if phone??>
+				and u.phone=:phone
+			</#if>
+			 and u.password=:password
+		]]>
 	</Query>
 	<Query name="checkUser" type="HQL" freemarkFormat="false" Alias="true">
 		SELECT COUNT(*) FROM User u WHERE u.phone=:phone

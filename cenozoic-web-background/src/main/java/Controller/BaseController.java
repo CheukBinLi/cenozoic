@@ -1,7 +1,6 @@
 package Controller;
 
 import java.io.IOException;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,49 +16,60 @@ import org.springframework.web.servlet.ModelAndView;
 import com.freepig.cenozoic.code.dbmapper.entity.User;
 import com.freepig.cenozoic.code.dbmapper.service.UserService;
 
+import util.RandomImage;
+import util.ResponseCharset;
+
 @Scope("prototype")
 @Controller
 @RequestMapping({ "/*", "/", "/**/**" })
 public class BaseController extends AbstractController {
 
-	//	@Autowired
-	//	private UserService userService;
+	@Autowired
+	private UserService userService;
 
-	@RequestMapping("{path}.html")
+	@RequestMapping("{path}")
 	public ModelAndView basePath(HttpServletRequest request, HttpServletResponse response, @PathVariable("path") String path) throws IOException {
 		return new ModelAndView(path, getParams(request));
 	}
 
-	@RequestMapping("/*/controller/{path}.js")
-	public ModelAndView resourceFilder(HttpServletRequest request, HttpServletResponse response, @PathVariable("path") String path) throws IOException {
-		System.out.println(request.getRequestURI());
-		return new ModelAndView(request.getRequestURI(), getParams(request));
-	}
-
-	@RequestMapping("x2")
-	public void aa1(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-		User u = new User("13122222222", "AABBCC");
-		//		userService.save(u);
-		//		u = userService.getByPk(new User(7));
-		//		Map<String, Object> x = getParams(request);
-		//		x.remove("id");
-		//		u = userService.login(x);
-		//		System.err.println(String.format("id:%s name:%s phone:%s", u.getId(), u.getName(), u.getPassword()));
-	}
-
+	@RequestMapping("login")
 	@ResponseBody
-	@RequestMapping("x1")
-	public Object aa() throws Throwable {
-		String[] o = new String[] { "123", "321", "123" };
-		//		userService.checkUser("13122222222");
-		return o;
+	public Object login(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		User u = null;
+		try {
+			u = userService.login(getParams(request));
+			if (null != u)
+				return 1;
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		return 0;
 	}
 
-	@ResponseBody
-	@RequestMapping("user_check")
-	public Object userCheck(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-		//		return userService.checkUser(getParams(request)) ? 1 : 0;
-		return 1;
+	// 验证码
+	@RequestMapping(value = "verificationcode")
+	public void ramdonImage(HttpServletRequest request, HttpServletResponse response) {
+		// @RequestParam("validation") boolean validation,
+		// @RequestParam("verificationCode") String verificationCode
+		System.out.println("verificationcode");
+		String o = request.getParameter("validation");
+		boolean validation = (null != o && o.equalsIgnoreCase("true")) ? true : false;
+		String verificationCode = request.getParameter("verificationCode");
+		if (validation) {
+			RandomImage.randomImage(response, request, 100, 30, 18);
+			return;
+		}
+		// 验证
+		response = ResponseCharset.responseChangeEncodeUTF8(response);
+		try {
+			String result = "fail";
+			if (null != verificationCode && verificationCode.toUpperCase().equals(request.getSession().getAttribute("verificationCode"))) {
+				result = "success";
+			}
+			response.getWriter().write(result);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
