@@ -6,12 +6,18 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.freepig.cenozoic.code.dbmapper.dao.AbstractDao;
 import com.freepig.cenozoic.code.dbmapper.dao.UserDao;
 import com.freepig.cenozoic.code.dbmapper.entity.User;
 import com.freepig.cenozoic.code.util.HibernateUtil;
 
 @Component
-public class UserDaoImpl implements UserDao {
+public class UserDaoImpl extends AbstractDao<User> implements UserDao {
+
+	@Override
+	public Class<User> getEntityClass() {
+		return User.class;
+	}
 
 	@Autowired
 	private HibernateUtil hibernateUtil;
@@ -38,21 +44,14 @@ public class UserDaoImpl implements UserDao {
 
 	@SuppressWarnings("rawtypes")
 	public User login(Map<String, Object> params) throws Throwable {
-		List list = hibernateUtil.getListByXqlQueryName(hibernateUtil.queryNameFormat(User.class, "login"), true, true, params);
+		List list = hibernateUtil.getListByXqlQueryName(hibernateUtil.queryNameFormat(getEntityClass(), "login"), true, true, params);
 		if (null != list)
 			return (User) (list.size() > 0 ? list.get(0) : null);
 		return null;
 	}
 
 	public int checkUser(Map<String, Object> params) throws Throwable {
-		long o = (Long) hibernateUtil.uniqueResult(hibernateUtil.queryNameFormat(User.class, "checkUser"), true, false, params);
+		long o = (Long) hibernateUtil.uniqueResult(hibernateUtil.queryNameFormat(getEntityClass(), "checkUser"), true, false, params);
 		return (int) o;
 	}
-
-	//	@SuppressWarnings({ "rawtypes", "unchecked" })
-	//	public List<User> getListByHql(String hql, Object params) throws Throwable {
-	//		List list = hibernateUtil.getListByHQL("from com.freepig.cenozoic.code.dbmapper.entity.User u", null);
-	//		return list;
-	//	}
-
 }

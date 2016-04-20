@@ -1,14 +1,13 @@
 package com.freepig.cenozoic.code.dbmapper.entity;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity(name = "RES_USER")
-public class User implements Serializable {
+public class User extends AbstractEntity {
+
 	private static final long serialVersionUID = 1L;
 
 	@Id

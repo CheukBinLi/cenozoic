@@ -103,6 +103,17 @@ public interface HibernateUtil {
 
 	/***
 	 * 
+	 * @param queryName 模板查询
+	 * @param params 参数( 问题号 ? :数组传入 )
+	 * @return
+	 * @throws Throwable
+	 */
+	public <T> List<T> getListByXqlQueryName(String queryName, boolean isHQL, Object... params) throws Throwable;
+
+	public <T> List<T> getListByXqlQueryName(String queryName, boolean isHQL, int page, int size, Object... params) throws Throwable;
+
+	/***
+	 * 
 	 * query模板查询 * @param queryName 查询语句名
 	 * 
 	 * @param params

@@ -5,14 +5,14 @@ import java.util.Map;
 
 public interface BaseService<entity> {
 
-	entity getByPk(entity obj) throws Throwable;
+	entity getByPk(Map<String, Object> params) throws Throwable;
 
 	List<entity> getList() throws Throwable;
 
-	entity save(entity obj) throws Throwable;
+	entity save(Map<String, Object> params) throws Throwable;
 
-	void update(entity obj) throws Throwable;
+	void update(Map<String, Object> params) throws Throwable;
 
-	void delete(entity obj) throws Throwable;
+	void delete(Map<String, Object> params) throws Throwable;
 
 }

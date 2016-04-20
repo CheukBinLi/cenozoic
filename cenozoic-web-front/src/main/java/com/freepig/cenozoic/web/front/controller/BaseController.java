@@ -34,7 +34,7 @@ public class BaseController extends AbstractController {
 	public void aa1(HttpServletRequest request, HttpServletResponse response) throws Throwable {
 		User u = new User("13122222222", "AABBCC");
 		//		userService.save(u);
-		u = userService.getByPk(new User(7));
+		//		u = userService.getByPk(new User(7));
 		Map<String, Object> x = getParams(request);
 		x.remove("id");
 		u = userService.login(x);

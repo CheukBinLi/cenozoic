@@ -45,22 +45,22 @@ public class UserServiceImpl extends ObjectFill implements UserService {
 		return userDao.login(params);
 	}
 
-	public User getByPk(User obj) throws Throwable {
-		return userDao.get(obj.getId());
-	}
-
-	public User save(User obj) throws Throwable {
-		return userDao.save(obj);
-	}
-
-	public void update(User obj) throws Throwable {
-		userDao.update(obj);
-	}
-
-	public void delete(User obj) throws Throwable {
-		userDao.delete(obj);
-
-	}
+	//	public User getByPk(User obj) throws Throwable {
+	//		return userDao.get(obj.getId());
+	//	}
+	//
+	//	public User save(User obj) throws Throwable {
+	//		return userDao.save(obj);
+	//	}
+	//
+	//	public void update(User obj) throws Throwable {
+	//		userDao.update(obj);
+	//	}
+	//
+	//	public void delete(User obj) throws Throwable {
+	//		userDao.delete(obj);
+	//
+	//	}
 
 	public boolean checkUser(Map<String, Object> params) throws Throwable {
 		//		Map<String, Object> params = new HashMap<String, Object>();
